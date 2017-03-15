@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\SelectList;
 use Image; 
 use File;
-
+use Validator;
  
 
 class Controller1 extends Controller
@@ -17,33 +17,24 @@ class Controller1 extends Controller
        $listSelect = SelectList::select(['id','title','status','date'])
                ->groupBy('id')
                ->paginate(7); 
-      
-//        $listSelect = Controller1::table('select_lists')
-//                ->select(['id','title','status','date'])
-//                ->groupBy('id')
-//                ->get();
-//        
+     
         
         return view('list')->with(['listSelect' =>$listSelect]); 
-    }
-    
-    
-//    public function  ajaxList(Request $request)  for  second ajax
-//    {
-//        $listSelect = SelectList::find($request->idL2);
-//        
-//        return response()->json(array('title2'=>$listSelect->title, 'text2'=>$listSelect->text, 'status2'=>$listSelect->status,
-//        'date2'=>$listSelect->date), 200);
-//        
-//    }
-
-
-    
-    
-    
+    }       
     
     public function edit($id)
     {      
+                $request['id'] = $id;
+        
+       $validator = Validator::make($request, [
+           'id' => 'required|integer',          
+       ]);
+        
+       if($validator->fails()) {
+           return view('notExist');
+       }
+        
+        
         $listSelect = SelectList::find($id);
          return response()->json(array('title'=>$listSelect->title, 'text'=>$listSelect->text, 'status'=>$listSelect->status,
         'date'=>$listSelect->date, 'idL'=>$listSelect->id), 200);
@@ -51,9 +42,35 @@ class Controller1 extends Controller
     }
    
     public function watchNews($id) {
-        $listSelect = SelectList::find($id);
+
+//        $request['id'] = $id;
+//        
+//       $validator = Validator::make($request, [
+//           'id' => 'required|integer',          
+//       ]);
+//        
+//       if($validator->fails()) {
+//           return view('notExist');
+//       }
+       $listSelect = SelectList::find($id); 
+    if($listSelect!== null)
+    {
+      //$listSelect = SelectList::find($id); 
         return view('watchNews')->with(['listSelect' => $listSelect]);
     }
+    else
+    {
+        return view('notExist');
+    }
+    
+    }
+    
+    
+    public function ret()
+    {
+        
+    }
+    
   
     public function showAdd()
     {
@@ -64,23 +81,25 @@ class Controller1 extends Controller
    public function store( Request $request)
     {
         //dump($request->all());
+       
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:50',
+            'text' => 'required',
+            'status' => 'required',
+            ]);
+
+        if ($validator->fails()) {
+        return response()->json(array('error' => '1'), 200);
+        }
+    
+       
         $listSelect = new SelectList;
         
         
-//        $listSelect->title = $request->input('title');
-//        $listSelect->text = $request->input('text');
          $listSelect->title = $request->title;
          $listSelect->text = $request->text;
         
-         
-//         
-//        if($request->input('status') == 'Active')
-//        {
-//        $listSelect->status = '1';  
-//        }
-//        else {
-//        $listSelect->status = '0'; 
-//        }
+        
         
          if($request->status == 'Active')
         {
@@ -101,15 +120,23 @@ class Controller1 extends Controller
         'date'=>$listSelect->date, 'idL'=>$listSelect->id), 200);
         
      
-        
-       
-   //  return redirect()->route('list');
-      //  return view('edit');
    }
    
    
    public function storePicture(Request $request, $idd)
    {
+               $request['idd'] = $idd;
+               $request['file'] = $request->file('file');
+        
+     
+            $validator = Validator::make($request->all(), [
+           'idd' => 'required|integer',  
+           'file' => 'mimes:jpeg,gif,png|nullable',
+       ]);
+        if ($validator->fails()) {
+        return response()->json(array('error2' => '1'), 200);
+        }
+       
        $fileik =  $request->file('file');
        
         
@@ -134,7 +161,20 @@ class Controller1 extends Controller
    
     public function editPicture(Request $request, $idd)
    {
-//    
+
+          $request['idd'] = $idd;
+          $request['file'] = $request->file('file');
+        
+     
+            $validator = Validator::make($request->all(), [
+           'idd' => 'required|integer',  
+           'file' => 'mimes:jpeg,gif,png|nullable',
+       ]);
+        if ($validator->fails()) {
+        return response()->json(array('error2' => '1'), 200);
+        }
+        
+        
        $fileik =  $request->file('file');
        
         
@@ -168,6 +208,17 @@ class Controller1 extends Controller
    
      public function changeName($name)
    {
+                 $request['name'] = $name;
+        
+       $validator = Validator::make($request, [
+           'name' => 'required|string',          
+       ]);
+        
+       if($validator->fails()) {
+         return response()->json(array('error3' => '1'), 200);
+       }
+         
+         
          $changedName = stristr($name, '_', true);
             if(file_exists(base_path().'/public/files/resized/'."image{$name}.".'png'))
             {
@@ -192,8 +243,18 @@ class Controller1 extends Controller
    
    public function editChange(Request $request)
    {
-      // dump($request->all());
-      //$listEdit = (new SelectList)->find($request->input($id));
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:50',
+            'text' => 'required',
+            'status' => 'required',
+            ]);
+
+        if ($validator->fails()) {
+        return response()->json(array('error' => '1'), 200);
+        }
+       
+       
         $listEdit = SelectList::find($request->idd);
       
        
@@ -227,6 +288,15 @@ class Controller1 extends Controller
    
    public function delete($id)
    {
+        $request['id'] = $id;
+        
+       $validator = Validator::make($request, [
+           'id' => 'required|integer',          
+       ]);
+        
+       if($validator->fails()) {
+           return response()->json(array('error3' => '1'), 200);
+       }
    
         if(file_exists(base_path().'/public/files/resized/'."image{$id}.".'png'))
             {

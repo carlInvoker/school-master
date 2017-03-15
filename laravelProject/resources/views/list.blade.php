@@ -6,6 +6,10 @@ header("Pragma: no-cache");
 header("Cache-Control: no-cache, must-revalidate");
 ?>
 
+@if($listSelect->currentPage()<=$listSelect->lastPage())   
+     
+      
+
 <html>
     
     <head>
@@ -212,10 +216,16 @@ $("#button_trigger").click( function(e) {
                $.ajax({
                method:'GET',
                url:url2,            
-               success:function()
+               success:function(data)
                {
-                   
+                   if(data.error3 === '1')
+                   {
+                       alert('nothing to delete');
+                   }
+                   else
+                   {
                    $('#rowId'+id).remove();
+                      }
                    
                },
                error:function() { alert('error'); }
@@ -263,6 +273,13 @@ $("#ffedit").submit(function(e)
                  return xhr.setRequestHeader('X-CSRF-TOKEN', token);           }
        },
               success:function(data){
+                   if (data.error === '1')
+   {
+        $("#dialog2").dialog("close");
+        alert('validation error');
+   }
+   else
+   {
                   console.log(data.idL); 
                   console.log(data.title); 
                   console.log(data.text); 
@@ -280,7 +297,10 @@ $("#ffedit").submit(function(e)
                data:fileform,
                success:function(data2)
                {
-                   
+                    if(data2.error2 === '1')
+                    {
+                        alert('no picture');
+                    }
                   console.log('success'+data2.ext);
                   ext = data2.ext;
                   
@@ -325,7 +345,10 @@ $.ajax({
                cache: false,
                success:function(data3)
                {
-                 //  alert(data3.chg);
+                   if(data3.error3 === '1')
+                   {
+                 alert('no picture name');
+             }
                },
                error:function() { alert('error'); } 
 });
@@ -340,7 +363,7 @@ $.ajax({
     //      ========================= end second ajax =================     
     
                        
-              },
+                       }},
               
                error:function() { alert('error'); }
            });
@@ -368,6 +391,9 @@ $("#ff").submit(function(e)
           $.ajax({
                method:'POST',
                url:url,
+               headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  },
            //    contentType: false,
            //    processData: false,
                data:{title:$('#title').val(),
@@ -385,7 +411,13 @@ $("#ff").submit(function(e)
               success:function(data){
               //  console.log(data.fileik); 
    
-   
+   if (data.error === '1')
+   {
+        $("#dialog").dialog("close");
+        alert('validation error');
+   }
+   else
+   {
    
    //    ================ second ajax ===========================
                      var  url2 = "http://laravelproject/public/ajaxList/"+data.idL;
@@ -393,18 +425,24 @@ $("#ff").submit(function(e)
                method:'POST',
                contentType: false,
                processData: false,
-               url:url2,            
+               url:url2,      
                data:fileform,
+                headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  },
                success:function(data2)
                {
-                  
+                   if(data2.error2 === '1')
+                    {
+                        alert('no picture');
+                    }
                   console.log('success'+data2.ext);
                   ext = data2.ext;
                                  
                     var localString = '<tr id="rowId'+data.idL+'"><td id="id'+data.idL+'">'+data.idL+'</td>';
                     localString+= '<td><a id="title'+data.idL+'"  href="http://laravelproject/public/watchNews/'+data.idL+'">'+data.title+'</a> </td>"';
                     
-                    
+                   
                     localString+= '<td id="img'+data.idL+'"><img src="/public/files/resized/image'+data.idL+'.'+ext+'" alt="no picture" /></td>';
                    // alert(localString);
                     if (data.status == 1)
@@ -432,9 +470,16 @@ $("#ff").submit(function(e)
                $.ajax({
                method:'GET',
                url:url2,            
-               success:function()
+               success:function(data)
                {               
-                   $('#rowId'+id).remove();                  
+                   if(data.error3 === '1')
+                   {
+                       alert('nothing to delete');
+                   }
+                   else
+                   {
+                   $('#rowId'+id).remove();
+                      }              
                },
                error:function() { alert('error'); }                         
                });
@@ -504,7 +549,7 @@ $("#ff").submit(function(e)
       
                      
                },
-               error:function() { alert('error'); }                          
+               error:function() { alert(data.error[0]); }                          
                });      
         }
           
@@ -544,6 +589,13 @@ $("#ffedit").submit(function(e)
                  return xhr.setRequestHeader('X-CSRF-TOKEN', token);           }
        },
               success:function(data){
+                   if (data.error === '1')
+   {
+        $("#dialog2").dialog("close");
+        alert('validation error');
+   }
+   else
+   {
                   console.log(data.idL); 
                   console.log(data.title); 
                   console.log(data.text); 
@@ -578,6 +630,10 @@ $("#ffedit").submit(function(e)
                     {
                      document.getElementById('status'+data.idL).innerHTML ='Passive';
                     }
+                     if(data2.error2 === '1')
+                    {
+                        alert('no picture');
+                    }
                       if(ext !== undefined)
                 {
                  
@@ -595,9 +651,12 @@ $.ajax({
                cache: false,
                success:function(data3)
                {
-                 //  alert(data3.chg);
+                   if(data3.error3 === '1')
+                   {
+                 alert('no picture name');
+                   }
                },
-               error:function() { alert('error'); } 
+               error:function() { alert('error third ajax'); } 
 });
 // ===================================== end third ajax ========================
                     $("#dialog2").dialog("close");   
@@ -611,7 +670,7 @@ $.ajax({
     //      ========================= end second ajax =================         
    
                        
-              },
+              }},
               
                error:function() { alert('error'); }
            });
@@ -622,7 +681,7 @@ $.ajax({
                   
                    $("#dialog").dialog("close");
                },
-               error:function() { alert('error'); }
+               error:function() { alert('error second ajax'); }
                           
                 });
     //      ========================= end second ajax =================         
@@ -630,9 +689,9 @@ $.ajax({
                     
                     
                
-              },
+               }},
               
-               error:function() { alert('error'); }
+               error:function(data) { alert('insert error'); }
            });
         });
     //=============================== end insert ===============================
@@ -697,8 +756,8 @@ $.ajax({
 <!--       id="simpleList"     id="dialog_trigger"   {{ route('deleteList', ['id'=>$list->id])}}   onclick="return confirm('Delete?');"    {{ route('editList', ['id'=>$list->id])}}-->
         </table>
         
-        {{ $listSelect->links() }}  
-       
+        {{ $listSelect->links() }} 
+      
         <div style="margin-left: 8px; margin-bottom:8px; ">
         <a class="btn btn-default" id='button_trigger' href="" role="button">Add new value</a>
         </div>
@@ -800,4 +859,15 @@ $.ajax({
     
     
 </html>
-  
+
+@else
+    <html>
+        <body>
+<div id='a'  hidden="true">{{$listSelect->lastPage()}}</div>
+
+       </body>
+       <script type='text/javascript'>
+    window.location.replace("http://laravelproject/public/?page="+document.getElementById('a').innerHTML);
+    </script>  
+    </html>
+   @endif

@@ -16,6 +16,8 @@ Route::get('/', 'Controller1@someName')->name('list');
 Route::get('watchNews/{id}', 'Controller1@watchNews')->name('watchIt');
 Route::get('add/','Controller1@showAdd')->name('showAddList');
 
+Route::get('/notExist', 'Controller@ret')->name('ret');
+
 Route::post('/add','Controller1@store')->name('add');
 Route::post('/ajaxList/{idd}', 'Controller1@storePicture');
 Route::post('/editList', 'Controller1@editChange')->name('editChange');
